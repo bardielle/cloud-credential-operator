@@ -171,7 +171,7 @@ github.com/mitchellh/go-homedir
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/openshift/api v0.0.0-20200901182017-7ac89ba6b971
+# github.com/openshift/api v0.0.0-20200901182017-7ac89ba6b971 => github.com/nirarg/api v0.0.0-20200803123134-acfad52c109f
 github.com/openshift/api
 github.com/openshift/api/apps
 github.com/openshift/api/apps/v1
@@ -823,7 +823,7 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
-# sigs.k8s.io/controller-runtime v0.6.2
+# sigs.k8s.io/controller-runtime v0.6.2 => github.com/joelanford/controller-runtime v0.2.0-beta.1.0.20200723141319-3249b9ca8d12
 sigs.k8s.io/controller-runtime/pkg/cache
 sigs.k8s.io/controller-runtime/pkg/cache/internal
 sigs.k8s.io/controller-runtime/pkg/client

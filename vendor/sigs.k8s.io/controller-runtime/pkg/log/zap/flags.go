@@ -29,16 +29,16 @@ import (
 )
 
 var levelStrings = map[string]zapcore.Level{
-	"debug": zap.DebugLevel,
-	"info":  zap.InfoLevel,
-	"error": zap.ErrorLevel,
-}
-
-// TODO Add level to disable stacktraces.
-// https://github.com/kubernetes-sigs/controller-runtime/issues/1035
-var stackLevelStrings = map[string]zapcore.Level{
-	"info":  zap.InfoLevel,
-	"error": zap.ErrorLevel,
+	"debug":  zap.DebugLevel,
+	"-1":     zap.DebugLevel,
+	"info":   zap.InfoLevel,
+	"0":      zap.InfoLevel,
+	"error":  zap.ErrorLevel,
+	"2":      zap.ErrorLevel,
+	"dpanic": zap.DPanicLevel,
+	"panic":  zap.PanicLevel,
+	"warn":   zap.WarnLevel,
+	"fatal":  zap.FatalLevel,
 }
 
 type encoderFlag struct {
@@ -100,9 +100,8 @@ func (ev *levelFlag) Set(flagValue string) error {
 		} else {
 			return fmt.Errorf("invalid log level \"%s\"", flagValue)
 		}
-	} else {
-		ev.setFunc(zap.NewAtomicLevelAt(level))
 	}
+	ev.setFunc(zap.NewAtomicLevelAt(level))
 	ev.value = flagValue
 	return nil
 }
@@ -123,7 +122,7 @@ type stackTraceFlag struct {
 var _ pflag.Value = &stackTraceFlag{}
 
 func (ev *stackTraceFlag) Set(flagValue string) error {
-	level, validLevel := stackLevelStrings[strings.ToLower(flagValue)]
+	level, validLevel := levelStrings[strings.ToLower(flagValue)]
 	if !validLevel {
 		return fmt.Errorf("invalid stacktrace level \"%s\"", flagValue)
 	}
