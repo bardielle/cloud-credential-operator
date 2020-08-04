@@ -49,3 +49,7 @@ require (
 	k8s.io/code-generator v0.19.0
 	sigs.k8s.io/controller-runtime v0.6.2
 )
+
+replace sigs.k8s.io/controller-runtime => github.com/joelanford/controller-runtime v0.2.0-beta.1.0.20200723141319-3249b9ca8d12
+
+replace github.com/openshift/api => github.com/nirarg/api v0.0.0-20200803123134-acfad52c109f

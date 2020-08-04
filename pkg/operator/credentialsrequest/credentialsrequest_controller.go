@@ -379,6 +379,7 @@ func isAdminCredSecret(namespace, secretName string) bool {
 			secretName == constants.GCPCloudCredSecretName ||
 			secretName == constants.OpenStackCloudCredsSecretName ||
 			secretName == constants.OvirtCloudCredsSecretName ||
+			secretName == constants.KubevirtCloudCredSecretName ||
 			secretName == constants.VSphereCloudCredSecretName {
 			log.WithField("secret", secretName).WithField("namespace", namespace).Info("observed admin cloud credential secret event")
 			return true
