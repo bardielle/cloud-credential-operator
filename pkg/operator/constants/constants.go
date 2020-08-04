@@ -94,6 +94,10 @@ const (
 	// VSphereCloudCredSecretName is the name of the secret where credentials
 	// for vSphere are stored.
 	VSphereCloudCredSecretName = "vsphere-creds"
+
+	// KubevirtCloudCredSecretName is the name of the secret where credentials
+	// for Kubevirt are stored.
+	KubevirtCloudCredSecretName = "kubevirt-credentials"
 )
 
 var (
