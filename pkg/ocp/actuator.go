@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"errors"
+	"github.com/openshift/cloud-credential-operator/pkg/operator/constants"
 
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -113,6 +114,11 @@ func (a *OCPActuator) Delete(ctx context.Context, cr *minterv1.CredentialsReques
 	}
 
 	return nil
+}
+
+// GetCredentialsRootSecretLocation returns the namespace and name where the parent credentials secret is stored.
+func (a *OCPActuator) GetCredentialsRootSecretLocation() types.NamespacedName {
+	return types.NamespacedName{Namespace: constants.CloudCredSecretNamespace, Name: constants.KubevirtCloudCredSecretName}
 }
 
 func (a *OCPActuator) getSecret(cr *minterv1.CredentialsRequest, logger log.FieldLogger) (*corev1.Secret, error) {
