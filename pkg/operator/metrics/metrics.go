@@ -193,6 +193,8 @@ func cloudProviderSpecToMetricsKey(cloud string) string {
 		return "ovirt"
 	case "VsphereProviderSpec":
 		return "vsphere"
+	case "KubevirtProviderSpec":
+		return "kubevirt"
 	default:
 		return "unknown"
 	}
