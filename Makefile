@@ -113,6 +113,13 @@ run: build
 install: update-codegen
 	kubectl apply -f manifests/00-crd.yaml
 
+generate:
+	go generate ./pkg/... ./cmd/...
+
+test: generate fmt vet manifests
+	go test ./pkg/... ./cmd/... -coverprofile cover.out
+
+
 # TODO targets for backward compatibility while we make the shift in CI
 test-no-gen: test
 .PHONY: test-no-gen
@@ -122,3 +129,18 @@ vet: verify-govet
 
 build-no-gen: build
 .PHONY: build-no-gen
+
+# Build the image with buildah
+.PHONY: buildah-build
+buildah-build: test
+	BUILDAH_ISOLATION=chroot $(SUDO_CMD) buildah bud --tag ${IMG} .
+
+.PHONY: buildah-push
+buildah-push: buildah-build
+	$(SUDO_CMD) buildah push ${IMG}
+
+# Deploy controller in the configured Kubernetes cluster in ~/.kube/config
+.PHONY: manifests
+deploy: manifests
+	kubectl apply -f config/crds
+	kustomize build config | kubectl apply -f -

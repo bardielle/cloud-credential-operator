@@ -3,11 +3,12 @@ package utils
 import (
 	"context"
 	"fmt"
+
+	metaerrors "k8s.io/apimachinery/pkg/api/meta"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	metaerrors "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	utilrand "k8s.io/apimachinery/pkg/util/rand"
@@ -249,6 +250,7 @@ func getOperatorMode(kubeClient client.Client, logger log.FieldLogger) (operator
 	}
 
 	return conf.Spec.CredentialsMode, nil
+	//return "Passthrough", nil
 }
 
 // CCODisabledCheck will take the operator configuration ConfigMap and return
