@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocp_test
+package kubevirt_test
 
 import (
 	"context"
 	"fmt"
-	"github.com/openshift/cloud-credential-operator/pkg/ocp"
+	"github.com/openshift/cloud-credential-operator/pkg/kubevirt"
 	kubernetesErrors "k8s.io/apimachinery/pkg/api/errors"
 	"reflect"
 	"testing"
@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	testNamespace        = "openshift-cloud-credential-operator"
+	testNamespace        = "Kubevirt-cloud-credential-operator"
 	testCredRequestName  = "openshift-machine-api-kubevirt"
 	testInfrastructureName = "test-cluster-abcd"
 	testRandomSuffix     = "random"
@@ -57,7 +57,7 @@ var (
 			Namespace:                  constants.CloudCredSecretNamespace,
 		},
 		Data:       map[string][]byte{
-			ocp.KubevirtCredentialsSecretKey: kubevirtCredentialData,
+			kubevirt.KubevirtCredentialsSecretKey: kubevirtCredentialData,
 		},
 	}
 
@@ -67,7 +67,7 @@ var (
 			Namespace:                  testOpenshiftMachineApiKubevirtNamespace,
 		},
 		Data:       map[string][]byte{
-			ocp.KubevirtCredentialsSecretKey: kubevirtCredentialData,
+			kubevirt.KubevirtCredentialsSecretKey: kubevirtCredentialData,
 		},
 	}
 
@@ -137,7 +137,7 @@ func TestCreateCR(t *testing.T) {
 			allObjects := append(test.existing, test.credentialsRequest)
 			fakeClient := fake.NewFakeClientWithScheme(scheme.Scheme, allObjects...)
 
-			actuator, err := ocp.NewActuator(fakeClient)
+			actuator, err := kubevirt.NewActuator(fakeClient)
 			if err != nil {
 				assert.Regexp(t, test.errRegexp, err)
 				assert.Nil(t, actuator)
@@ -190,7 +190,7 @@ func TestDeleteCR(t *testing.T) {
 			allObjects := append(test.existing, test.credentialsRequest)
 			fakeClient := fake.NewFakeClientWithScheme(scheme.Scheme, allObjects...)
 
-			actuator, err := ocp.NewActuator(fakeClient)
+			actuator, err := kubevirt.NewActuator(fakeClient)
 			if err != nil {
 				assert.Regexp(t, test.errRegexp, err)
 				assert.Nil(t, actuator)
@@ -251,7 +251,7 @@ func TestExistsCR(t *testing.T) {
 			allObjects := append(test.existing, test.credentialsRequest)
 			fakeClient := fake.NewFakeClientWithScheme(scheme.Scheme, allObjects...)
 
-			actuator, err := ocp.NewActuator(fakeClient)
+			actuator, err := kubevirt.NewActuator(fakeClient)
 			if err != nil {
 				assert.Regexp(t, test.errRegexp, err)
 				assert.Nil(t, actuator)
@@ -316,7 +316,7 @@ func TestUpdateCR(t *testing.T) {
 			allObjects := append(test.existing, test.credentialsRequest)
 			fakeClient := fake.NewFakeClientWithScheme(scheme.Scheme, allObjects...)
 
-			actuator, err := ocp.NewActuator(fakeClient)
+			actuator, err := kubevirt.NewActuator(fakeClient)
 			if err != nil {
 				assert.Regexp(t, test.errRegexp, err)
 				assert.Nil(t, actuator)
@@ -374,7 +374,7 @@ func existingObjectsAfterCreate(t *testing.T) []runtime.Object {
 func testCredentialsRequest(t *testing.T) *minterv1.CredentialsRequest {
 	codec, err := minterv1.NewCodec()
 	if err != nil {
-		t.Fatalf("error creating OCP codec: %v", err)
+		t.Fatalf("error creating Kubevirt codec: %v", err)
 	}
 
 	rawObj, err := codec.EncodeProviderSpec(kubevirtSpec)
