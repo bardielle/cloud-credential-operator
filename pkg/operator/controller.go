@@ -31,7 +31,7 @@ import (
 	"github.com/openshift/cloud-credential-operator/pkg/operator/secretannotator"
 	"github.com/openshift/cloud-credential-operator/pkg/ovirt"
 	"github.com/openshift/cloud-credential-operator/pkg/util"
-	"github.com/openshift/cloud-credential-operator/pkg/ocp"
+	"github.com/openshift/cloud-credential-operator/pkg/kubevirt"
 	vsphereactuator "github.com/openshift/cloud-credential-operator/pkg/vsphere/actuator"
 
 	configv1 "github.com/openshift/api/config/v1"
@@ -123,10 +123,9 @@ func AddToManager(m manager.Manager, explicitKubeconfig string) error {
 			if err != nil {
 				return err
 			}
-		// TODO: change it to OCP
 		case configv1.KubevirtPlatformType:
-			log.Info("initializing OCP actuator")
-			a, err = ocp.NewActuator(m.GetClient())
+			log.Info("initializing Kubevirt actuator")
+			a, err = kubevirt.NewActuator(m.GetClient())
 			if err != nil {
 				return err
 			}
