@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package ocp
+package kubevirt
 
 import (
 	"context"
@@ -36,7 +36,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type OCPActuator struct {
+type KubevirtActuator struct {
 	Client client.Client
 	Codec  *minterv1.ProviderCodec
 }
@@ -44,15 +44,15 @@ type OCPActuator struct {
 const (
 	KubevirtCredentialsSecretKey = "kubeconfig"
 )
-// NewActuator creates a new OCP actuator.
-func NewActuator(client client.Client) (*OCPActuator, error) {
+// NewActuator creates a new Kubevirt actuator.
+func NewActuator(client client.Client) (*KubevirtActuator, error) {
 	codec, err := minterv1.NewCodec()
 	if err != nil {
-		log.WithError(err).Error("error creating OCP codec")
-		return nil, fmt.Errorf("error creating OCP codec: %v", err)
+		log.WithError(err).Error("error creating Kubevirt codec")
+		return nil, fmt.Errorf("error creating Kubevirt codec: %v", err)
 	}
 
-	return &OCPActuator{
+	return &KubevirtActuator{
 		Codec:  codec,
 		Client: client,
 	}, nil
@@ -60,7 +60,7 @@ func NewActuator(client client.Client) (*OCPActuator, error) {
 
 // Exists checks if the credentials currently exist.
 // TODO: in the future validate the expiration of the credentials
-func (a *OCPActuator) Exists(ctx context.Context, cr *minterv1.CredentialsRequest) (bool, error) {
+func (a *KubevirtActuator) Exists(ctx context.Context, cr *minterv1.CredentialsRequest) (bool, error) {
 	logger := a.getLogger(cr)
 	logger.Debug("running Exists")
 	var err error
@@ -74,21 +74,21 @@ func (a *OCPActuator) Exists(ctx context.Context, cr *minterv1.CredentialsReques
 }
 
 // Create the credentials.
-func (a *OCPActuator) Create(ctx context.Context, cr *minterv1.CredentialsRequest) error {
+func (a *KubevirtActuator) Create(ctx context.Context, cr *minterv1.CredentialsRequest) error {
 	logger := a.getLogger(cr)
 	logger.Debug("running Create")
 	return a.sync(ctx, cr, logger)
 }
 
 // Update the credentials to the provided definition.
-func (a *OCPActuator) Update(ctx context.Context, cr *minterv1.CredentialsRequest) error {
+func (a *KubevirtActuator) Update(ctx context.Context, cr *minterv1.CredentialsRequest) error {
 	logger := a.getLogger(cr)
 	logger.Debug("running Update")
 	return a.sync(ctx, cr, logger)
 }
 
 // Delete credentials
-func (a *OCPActuator) Delete(ctx context.Context, cr *minterv1.CredentialsRequest) error {
+func (a *KubevirtActuator) Delete(ctx context.Context, cr *minterv1.CredentialsRequest) error {
 	logger := a.getLogger(cr)
 	logger.Debug("running Delete")
 
@@ -107,11 +107,11 @@ func (a *OCPActuator) Delete(ctx context.Context, cr *minterv1.CredentialsReques
 }
 
 // GetCredentialsRootSecretLocation returns the namespace and name where the parent credentials secret is stored.
-func (a *OCPActuator) GetCredentialsRootSecretLocation() types.NamespacedName {
+func (a *KubevirtActuator) GetCredentialsRootSecretLocation() types.NamespacedName {
 	return types.NamespacedName{Namespace: constants.CloudCredSecretNamespace, Name: constants.KubevirtCloudCredSecretName}
 }
 
-func (a *OCPActuator) sync(ctx context.Context, cr *minterv1.CredentialsRequest,  logger log.FieldLogger) error {
+func (a *KubevirtActuator) sync(ctx context.Context, cr *minterv1.CredentialsRequest,  logger log.FieldLogger) error {
 	logger.Debug("running sync")
 
 	// get the secret data from the credentials request
@@ -140,7 +140,7 @@ func (a *OCPActuator) sync(ctx context.Context, cr *minterv1.CredentialsRequest,
 	return nil
 }
 
-func (a *OCPActuator) getCredentialsSecretData(ctx context.Context, logger log.FieldLogger) ([]byte, error) {
+func (a *KubevirtActuator) getCredentialsSecretData(ctx context.Context, logger log.FieldLogger) ([]byte, error) {
 	// get the secret of the kubevirt credentials
 	kubevirtCredentialsSecret := &corev1.Secret{}
 	if err := a.Client.Get(ctx, a.GetCredentialsRootSecretLocation(), kubevirtCredentialsSecret); err != nil {
@@ -162,7 +162,7 @@ func (a *OCPActuator) getCredentialsSecretData(ctx context.Context, logger log.F
 	return infraClusterKubeconfig, nil
 }
 
-func (a *OCPActuator) syncCredentialSecret(ctx context.Context, cr *minterv1.CredentialsRequest, kubevirtCredentialData *[]byte, existingSecret *corev1.Secret, logger log.FieldLogger) error{
+func (a *KubevirtActuator) syncCredentialSecret(ctx context.Context, cr *minterv1.CredentialsRequest, kubevirtCredentialData *[]byte, existingSecret *corev1.Secret, logger log.FieldLogger) error{
 	if existingSecret == nil {
 		if kubevirtCredentialData == nil {
 			msg := "new access key secret needed but no key data provided"
@@ -179,7 +179,7 @@ func (a *OCPActuator) syncCredentialSecret(ctx context.Context, cr *minterv1.Cre
 	return a.updateExistingSecret(logger, existingSecret, cr, kubevirtCredentialData)
 }
 
-func (a *OCPActuator) updateExistingSecret(logger log.FieldLogger, existingSecret *corev1.Secret, cr *minterv1.CredentialsRequest, kubevirtCredentialData *[]byte) error {
+func (a *KubevirtActuator) updateExistingSecret(logger log.FieldLogger, existingSecret *corev1.Secret, cr *minterv1.CredentialsRequest, kubevirtCredentialData *[]byte) error {
 	// Update the existing secret:
 	logger.Debug("updating secret")
 	origSecret := existingSecret.DeepCopy()
@@ -210,7 +210,7 @@ func (a *OCPActuator) updateExistingSecret(logger log.FieldLogger, existingSecre
 	return nil
 }
 
-func (a *OCPActuator) createNewSecret(logger log.FieldLogger, cr *minterv1.CredentialsRequest, kubevirtCredentialData *[]byte, ctx context.Context) error {
+func (a *KubevirtActuator) createNewSecret(logger log.FieldLogger, cr *minterv1.CredentialsRequest, kubevirtCredentialData *[]byte, ctx context.Context) error {
 	logger.Info("creating secret")
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -234,7 +234,7 @@ func (a *OCPActuator) createNewSecret(logger log.FieldLogger, cr *minterv1.Crede
 	return nil
 }
 
-func (a *OCPActuator) getSecret(ctx context.Context, cr *minterv1.CredentialsRequest, logger log.FieldLogger) (*corev1.Secret, error) {
+func (a *KubevirtActuator) getSecret(ctx context.Context, cr *minterv1.CredentialsRequest, logger log.FieldLogger) (*corev1.Secret, error) {
 	logger.Debug("running getSecret")
 
 	existingSecret := &corev1.Secret{}
@@ -254,15 +254,15 @@ func (a *OCPActuator) getSecret(ctx context.Context, cr *minterv1.CredentialsReq
 	return existingSecret, nil
 }
 
-func (a *OCPActuator) getLogger(cr *minterv1.CredentialsRequest) log.FieldLogger {
+func (a *KubevirtActuator) getLogger(cr *minterv1.CredentialsRequest) log.FieldLogger {
 	return log.WithFields(log.Fields{
-		"actuator": "Openshift",
+		"actuator": "Kubevirt",
 		"targetSecret": fmt.Sprintf("%s/%s", cr.Spec.SecretRef.Namespace, cr.Spec.SecretRef.Name),
 		"cr":       fmt.Sprintf("%s/%s", cr.Namespace, cr.Name),
 	})
 }
 
-func (a *OCPActuator) Upgradeable(mode operatorv1.CloudCredentialsMode) *configv1.ClusterOperatorStatusCondition {
+func (a *KubevirtActuator) Upgradeable(mode operatorv1.CloudCredentialsMode) *configv1.ClusterOperatorStatusCondition {
 	upgradeableCondition := &configv1.ClusterOperatorStatusCondition{
 		Status: configv1.ConditionTrue,
 		Type:   configv1.OperatorUpgradeable,
@@ -270,6 +270,6 @@ func (a *OCPActuator) Upgradeable(mode operatorv1.CloudCredentialsMode) *configv
 	return upgradeableCondition
 }
 
-func (a *OCPActuator) GetUpcomingCredSecrets() []types.NamespacedName {
+func (a *KubevirtActuator) GetUpcomingCredSecrets() []types.NamespacedName {
 	return []types.NamespacedName{}
 }
